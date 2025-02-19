@@ -6,7 +6,7 @@ import com.example.starhub.dto.request.UpdateMeetingRequestDto;
 import com.example.starhub.dto.response.*;
 import com.example.starhub.entity.*;
 import com.example.starhub.entity.enums.ApplicationStatus;
-import com.example.starhub.entity.enums.RecruitmentType;
+import com.example.starhub.entity.enums.Duration;
 import com.example.starhub.entity.enums.TechCategory;
 import com.example.starhub.exception.*;
 import com.example.starhub.repository.*;
@@ -14,11 +14,15 @@ import com.example.starhub.response.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -99,20 +103,20 @@ public class MeetingService {
      * - 모임 요약 정보가 담긴 목록으로 제공
      * - 페이지네이션을 적용하고, 생성일 기준 내림차순으로 정렬
      *
-     * @param username JWT를 통해 인증된 사용자명
-     * @param page 페이지 번호
-     * @param size 페이지 크기
      * @return 모임 목록 응답 DTO
      */
-    public Page<MeetingSummaryResponseDto> getMeetingList(String username, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-        Page<MeetingEntity> meetingPage = meetingRepository.findAll(pageRequest);
+    public Page<MeetingSummaryResponseDto> getMeetingList(String username, String title, Integer minParticipants, Integer maxParticipants,
+                                                          List<String> techStacks, String location, Duration duration, Pageable pageable) {
 
-        return meetingPage.map(meetingEntity -> {
-            List<String> techStacks = getTechStacksForMeeting(meetingEntity);
-            LikeDto likeDto = getLikeDtoForMeeting(meetingEntity, username);
+        Page<MeetingEntity> meetingPage = meetingRepository.searchMeetings(
+                title, minParticipants, maxParticipants, techStacks, location, duration, pageable
+        );
 
-            return MeetingSummaryResponseDto.fromEntity(meetingEntity, techStacks, likeDto);
+        return meetingPage.map(meeting -> {
+            List<String> techStackNames = getTechStacksForMeeting(meeting);
+            LikeDto likeDto = getLikeDtoForMeeting(meeting, username);
+
+            return MeetingSummaryResponseDto.fromEntity(meeting, techStackNames, likeDto);
         });
     }
 

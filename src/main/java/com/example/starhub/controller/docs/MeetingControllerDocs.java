@@ -33,15 +33,6 @@ public interface MeetingControllerDocs {
     /**
      * 모임 목록 불러오기 (메인 화면에 쓰일 API)
      */
-    @Operation(
-            summary = "모임 목록 불러오기 (메인 화면에 쓰일 API)",
-            description = "모임 목록 불러오기를 진행합니다. 모임 카드 형식 정보가 담긴 목록을 불러옵니다."
-    )
-    ResponseEntity<ResponseDto> getMeetingList(
-            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "4") int size
-    );
 
     /**
      * 모임 상세 불러오기

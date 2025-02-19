@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface MeetingRepository extends JpaRepository<MeetingEntity, Long> {
+public interface MeetingRepository extends JpaRepository<MeetingEntity, Long>, MeetingRepositoryCustom {
 
     @Query("SELECT m FROM MeetingEntity m JOIN FETCH m.creator WHERE m.id = :meetingId")
     Optional<MeetingEntity> findWithCreatorById(@Param("meetingId") Long meetingId);

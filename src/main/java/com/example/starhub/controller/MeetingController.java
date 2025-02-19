@@ -9,12 +9,14 @@ import com.example.starhub.dto.response.MeetingDetailResponseDto;
 import com.example.starhub.dto.response.MeetingResponseDto;
 import com.example.starhub.dto.response.MeetingSummaryResponseDto;
 import com.example.starhub.dto.security.CustomUserDetails;
+import com.example.starhub.entity.enums.Duration;
 import com.example.starhub.response.code.ResponseCode;
 import com.example.starhub.response.dto.ResponseDto;
 import com.example.starhub.service.MeetingService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -47,14 +49,18 @@ public class MeetingController implements MeetingControllerDocs {
      * 모임 목록 불러오기 (메인 화면에 쓰일 API)
      */
     @GetMapping
-    public ResponseEntity<ResponseDto> getMeetingList(
+    public ResponseEntity<ResponseDto<Page<MeetingSummaryResponseDto>>> getMeetingList(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "4") int size) {
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Integer minParticipants,
+            @RequestParam(required = false) Integer maxParticipants,
+            @RequestParam(required = false) List<String> techStacks,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Duration duration,
+            Pageable pageable) {
 
-        // 익명 사용자일 경우 null 전달, 인증된 사용자일 경우 customUserDetails 전달
         String username = customUserDetails != null ? customUserDetails.getUsername() : null;
-        Page<MeetingSummaryResponseDto> res = meetingService.getMeetingList(username, page, size);
+        Page<MeetingSummaryResponseDto> res = meetingService.getMeetingList(username, title, minParticipants, maxParticipants, techStacks, location, duration, pageable);
         return ResponseEntity
                 .status(ResponseCode.SUCCESS_GET_MEETING_LIST.getStatus().value())
                 .body(new ResponseDto<>(ResponseCode.SUCCESS_GET_MEETING_LIST, res));
