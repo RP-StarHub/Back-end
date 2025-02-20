@@ -48,8 +48,8 @@ public class MeetingController implements MeetingControllerDocs {
     /**
      * 모임 목록 불러오기 (메인 화면에 쓰일 API)
      */
-    @GetMapping
-    public ResponseEntity<ResponseDto<Page<MeetingSummaryResponseDto>>> getMeetingList(
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDto<Page<MeetingSummaryResponseDto>>> searchMeetings(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Integer minParticipants,
@@ -57,10 +57,16 @@ public class MeetingController implements MeetingControllerDocs {
             @RequestParam(required = false) List<String> techStacks,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) Duration duration,
-            Pageable pageable) {
+            @RequestParam(required = true) Double minLatitude,
+            @RequestParam(required = true) Double maxLatitude,
+            @RequestParam(required = true) Double minLongitude,
+            @RequestParam(required = true) Double maxLongitude,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size) {
 
         String username = customUserDetails != null ? customUserDetails.getUsername() : null;
-        Page<MeetingSummaryResponseDto> res = meetingService.getMeetingList(username, title, minParticipants, maxParticipants, techStacks, location, duration, pageable);
+        Page<MeetingSummaryResponseDto> res = meetingService.searchMeetings(username, title, minParticipants, maxParticipants, techStacks, location, duration,
+                minLatitude, maxLatitude, minLongitude, maxLongitude, page, size);
         return ResponseEntity
                 .status(ResponseCode.SUCCESS_GET_MEETING_LIST.getStatus().value())
                 .body(new ResponseDto<>(ResponseCode.SUCCESS_GET_MEETING_LIST, res));

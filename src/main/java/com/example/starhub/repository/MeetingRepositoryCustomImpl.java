@@ -24,6 +24,7 @@ public class MeetingRepositoryCustomImpl implements MeetingRepositoryCustom {
     @Override
     public Page<MeetingEntity> searchMeetings(String title, Integer minParticipants, Integer maxParticipants,
                                               List<String> techStacks, String location, Duration duration,
+                                              Double minLatitude, Double maxLatitude, Double minLongitude, Double maxLongitude,
                                               Pageable pageable) {
 
         QMeetingEntity meeting = QMeetingEntity.meetingEntity;
@@ -51,7 +52,12 @@ public class MeetingRepositoryCustomImpl implements MeetingRepositoryCustom {
         if (duration != null) {
             builder.and(meeting.duration.eq(duration));
         }
-
+        if (minLatitude != null && maxLatitude != null) {
+            builder.and(meeting.latitude.between(minLatitude, maxLatitude));
+        }
+        if (minLongitude != null && maxLongitude != null) {
+            builder.and(meeting.longitude.between(minLongitude, maxLongitude));
+        }
         List<MeetingEntity> results = queryFactory.selectFrom(meeting)
                 .where(builder)
                 .orderBy(meeting.createdAt.desc())

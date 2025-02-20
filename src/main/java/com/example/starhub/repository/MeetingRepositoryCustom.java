@@ -10,6 +10,7 @@ import java.util.List;
 public interface MeetingRepositoryCustom {
 
     Page<MeetingEntity> searchMeetings(String title, Integer minParticipants, Integer maxParticipants,
-                                              List<String> techStacks, String location, Duration duration,
-                                              Pageable pageable);
+                                       List<String> techStacks, String location, Duration duration,
+                                       Double minLatitude, Double maxLatitude, Double minLongitude, Double maxLongitude,
+                                       Pageable pageable);
 }

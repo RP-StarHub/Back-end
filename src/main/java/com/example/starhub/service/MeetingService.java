@@ -105,12 +105,15 @@ public class MeetingService {
      *
      * @return 모임 목록 응답 DTO
      */
-    public Page<MeetingSummaryResponseDto> getMeetingList(String username, String title, Integer minParticipants, Integer maxParticipants,
-                                                          List<String> techStacks, String location, Duration duration, Pageable pageable) {
+    public Page<MeetingSummaryResponseDto> searchMeetings(String username, String title, Integer minParticipants, Integer maxParticipants,
+                                              List<String> techStacks, String location, Duration duration,
+                                              Double minLatitude, Double maxLatitude, Double minLongitude, Double maxLongitude,
+                                              int page, int size) {
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<MeetingEntity> meetingPage = meetingRepository.searchMeetings(
-                title, minParticipants, maxParticipants, techStacks, location, duration, pageable
-        );
+                title, minParticipants, maxParticipants,
+                techStacks, location, duration, minLatitude, maxLatitude, minLongitude, maxLongitude, pageable);
 
         return meetingPage.map(meeting -> {
             List<String> techStackNames = getTechStacksForMeeting(meeting);
