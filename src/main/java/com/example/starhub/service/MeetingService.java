@@ -2,11 +2,12 @@ package com.example.starhub.service;
 
 import com.example.starhub.dto.request.ConfirmMeetingRequestDto;
 import com.example.starhub.dto.request.CreateMeetingRequestDto;
+import com.example.starhub.dto.request.SearchFilterDto;
 import com.example.starhub.dto.request.UpdateMeetingRequestDto;
 import com.example.starhub.dto.response.*;
 import com.example.starhub.entity.*;
 import com.example.starhub.entity.enums.ApplicationStatus;
-import com.example.starhub.entity.enums.RecruitmentType;
+import com.example.starhub.entity.enums.Duration;
 import com.example.starhub.entity.enums.TechCategory;
 import com.example.starhub.exception.*;
 import com.example.starhub.repository.*;
@@ -14,6 +15,7 @@ import com.example.starhub.response.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,20 +101,25 @@ public class MeetingService {
      * - 모임 요약 정보가 담긴 목록으로 제공
      * - 페이지네이션을 적용하고, 생성일 기준 내림차순으로 정렬
      *
-     * @param username JWT를 통해 인증된 사용자명
-     * @param page 페이지 번호
-     * @param size 페이지 크기
      * @return 모임 목록 응답 DTO
      */
-    public Page<MeetingSummaryResponseDto> getMeetingList(String username, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-        Page<MeetingEntity> meetingPage = meetingRepository.findAll(pageRequest);
+    public Page<MeetingSummaryResponseDto> searchMeetings(String username, String title,
+                                                          SearchFilterDto searchFilterDto, int page, int size) {
 
-        return meetingPage.map(meetingEntity -> {
-            List<String> techStacks = getTechStacksForMeeting(meetingEntity);
-            LikeDto likeDto = getLikeDtoForMeeting(meetingEntity, username);
+        // 필터링 정보 가져오기
+        FilterData result = getFilterData(searchFilterDto);
 
-            return MeetingSummaryResponseDto.fromEntity(meetingEntity, techStacks, likeDto);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<MeetingEntity> meetingPage = meetingRepository.searchMeetings(
+                title, result.minParticipants(), result.maxParticipants(),
+                result.techStackIds(), result.location(), result.duration(),
+                result.minLatitude(), result.maxLatitude(), result.minLongitude(), result.maxLongitude(), pageable);
+
+        return meetingPage.map(meeting -> {
+            List<String> techStackNames = getTechStacksForMeeting(meeting);
+            LikeDto likeDto = getLikeDtoForMeeting(meeting, username);
+
+            return MeetingSummaryResponseDto.fromEntity(meeting, techStackNames, likeDto);
         });
     }
 
@@ -258,6 +265,25 @@ public class MeetingService {
 
         // 승인된 지원서들 반환
         return getConfirmedMembersForCreator(meetingEntity, creatorInfo);
+    }
+
+    private FilterData getFilterData(SearchFilterDto searchFilterDto) {
+        Integer minParticipants = searchFilterDto.getMinParticipants() != null ? searchFilterDto.getMinParticipants() : 0;
+        Integer maxParticipants = searchFilterDto.getMaxParticipants() != null ? searchFilterDto.getMaxParticipants() : Integer.MAX_VALUE;
+        List<Long> techStackIds = searchFilterDto.getTechStackIds() != null ? searchFilterDto.getTechStackIds() : Collections.emptyList();
+        String location = searchFilterDto.getLocation();
+        Duration duration = searchFilterDto.getDuration();
+        Double minLatitude = searchFilterDto.getMinLatitude();
+        Double maxLatitude = searchFilterDto.getMaxLatitude();
+        Double minLongitude = searchFilterDto.getMinLongitude();
+        Double maxLongitude = searchFilterDto.getMaxLongitude();
+
+        return new FilterData(minParticipants, maxParticipants, techStackIds, location, duration,
+                minLatitude, maxLatitude, minLongitude, maxLongitude);
+    }
+
+    private record FilterData(int minParticipants, int maxParticipants, List<Long> techStackIds, String location, Duration duration,
+                              Double minLatitude, Double maxLatitude, Double minLongitude, Double maxLongitude) {
     }
 
     /**

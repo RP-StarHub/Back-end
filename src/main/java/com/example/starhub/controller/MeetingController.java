@@ -3,23 +3,27 @@ package com.example.starhub.controller;
 import com.example.starhub.controller.docs.MeetingControllerDocs;
 import com.example.starhub.dto.request.ConfirmMeetingRequestDto;
 import com.example.starhub.dto.request.CreateMeetingRequestDto;
+import com.example.starhub.dto.request.SearchFilterDto;
 import com.example.starhub.dto.request.UpdateMeetingRequestDto;
 import com.example.starhub.dto.response.ConfirmMeetingResponseDto;
 import com.example.starhub.dto.response.MeetingDetailResponseDto;
 import com.example.starhub.dto.response.MeetingResponseDto;
 import com.example.starhub.dto.response.MeetingSummaryResponseDto;
 import com.example.starhub.dto.security.CustomUserDetails;
+import com.example.starhub.entity.enums.Duration;
 import com.example.starhub.response.code.ResponseCode;
 import com.example.starhub.response.dto.ResponseDto;
 import com.example.starhub.service.MeetingService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -46,15 +50,21 @@ public class MeetingController implements MeetingControllerDocs {
     /**
      * 모임 목록 불러오기 (메인 화면에 쓰일 API)
      */
-    @GetMapping
-    public ResponseEntity<ResponseDto> getMeetingList(
+    @PostMapping("/search")
+    public ResponseEntity<ResponseDto<Page<MeetingSummaryResponseDto>>> searchMeetings(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestParam(required = false) String title,
+            @RequestParam String c, // 지도의 좌표 대한 값
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "4") int size) {
+            @RequestParam(defaultValue = "4") int size,
+            @RequestBody SearchFilterDto searchFilterDto) {
 
-        // 익명 사용자일 경우 null 전달, 인증된 사용자일 경우 customUserDetails 전달
+        parseCoordinates(c, searchFilterDto);
+
         String username = customUserDetails != null ? customUserDetails.getUsername() : null;
-        Page<MeetingSummaryResponseDto> res = meetingService.getMeetingList(username, page, size);
+        System.out.println(searchFilterDto.getTechStackIds());
+        Page<MeetingSummaryResponseDto> res = meetingService.searchMeetings(username, title, searchFilterDto, page, size);
+
         return ResponseEntity
                 .status(ResponseCode.SUCCESS_GET_MEETING_LIST.getStatus().value())
                 .body(new ResponseDto<>(ResponseCode.SUCCESS_GET_MEETING_LIST, res));
@@ -132,4 +142,14 @@ public class MeetingController implements MeetingControllerDocs {
                 .status(ResponseCode.SUCCESS_GET_CONFIRMED_MEMBERS.getStatus().value())
                 .body(new ResponseDto<>(ResponseCode.SUCCESS_GET_CONFIRMED_MEMBERS, res));
     }
+
+    private void parseCoordinates(String c, SearchFilterDto searchFilterDto) {
+        String[] coordinates = c.split(",");
+        searchFilterDto.setMinLatitude(Double.parseDouble(coordinates[0]));
+        searchFilterDto.setMaxLatitude(Double.parseDouble(coordinates[1]));
+        searchFilterDto.setMinLongitude(Double.parseDouble(coordinates[2]));
+        searchFilterDto.setMaxLongitude(Double.parseDouble(coordinates[3]));
+    }
+
+
 }

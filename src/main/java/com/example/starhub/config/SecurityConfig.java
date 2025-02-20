@@ -86,7 +86,8 @@ public class SecurityConfig {
                         // 공개 접근 경로
                         .antMatchers("/api/v1/register", "/api/v1/users/check", "/api/v1/login", "/api/v1/reissue").permitAll()
                         .antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/starhub-api/**").permitAll()
-                        .antMatchers(HttpMethod.GET, "/api/v1/meetings", "/api/v1/meetings/{meetingId}").permitAll()
+                        .antMatchers(HttpMethod.GET, "/api/v1/meetings/{meetingId}").permitAll()
+                        .antMatchers(HttpMethod.POST, "/api/v1/meetings/search").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/v1/techStacks").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/v1/meetings/popular/projects", "/api/v1/meetings/popular/studies", "/api/v1/meetings/popular/expiring").permitAll()
 
