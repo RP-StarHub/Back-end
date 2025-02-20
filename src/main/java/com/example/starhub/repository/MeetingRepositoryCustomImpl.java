@@ -23,10 +23,9 @@ public class MeetingRepositoryCustomImpl implements MeetingRepositoryCustom {
 
     @Override
     public Page<MeetingEntity> searchMeetings(String title, Integer minParticipants, Integer maxParticipants,
-                                              List<String> techStacks, String location, Duration duration,
+                                              List<Long> techStackIds, String location, Duration duration,
                                               Double minLatitude, Double maxLatitude, Double minLongitude, Double maxLongitude,
                                               Pageable pageable) {
-
         QMeetingEntity meeting = QMeetingEntity.meetingEntity;
         QMeetingTechStackEntity meetingTechStack = QMeetingTechStackEntity.meetingTechStackEntity;
         QTechStackEntity techStack = QTechStackEntity.techStackEntity;
@@ -38,16 +37,16 @@ public class MeetingRepositoryCustomImpl implements MeetingRepositoryCustom {
         if (minParticipants != null && maxParticipants != null) {
             builder.and(meeting.maxParticipants.between(minParticipants, maxParticipants));
         }
-        if (techStacks != null && !techStacks.isEmpty()) {
+        if (techStackIds != null && !techStackIds.isEmpty()) {
             builder.and(meeting.id.in(
                     queryFactory.select(meetingTechStack.meeting.id)
                             .from(meetingTechStack)
                             .join(meetingTechStack.techStack, techStack)
-                            .where(techStack.name.in(techStacks))
+                            .where(techStack.id.in(techStackIds))
             ));
         }
         if (location != null && !location.isEmpty()) {
-            builder.and(meeting.location.eq(location));
+            builder.and(meeting.location.contains(location));
         }
         if (duration != null) {
             builder.and(meeting.duration.eq(duration));

@@ -62,6 +62,7 @@ public class MeetingController implements MeetingControllerDocs {
         parseCoordinates(c, searchFilterDto);
 
         String username = customUserDetails != null ? customUserDetails.getUsername() : null;
+        System.out.println(searchFilterDto.getTechStackIds());
         Page<MeetingSummaryResponseDto> res = meetingService.searchMeetings(username, title, searchFilterDto, page, size);
 
         return ResponseEntity

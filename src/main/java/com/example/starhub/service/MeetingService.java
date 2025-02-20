@@ -20,10 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -115,7 +112,7 @@ public class MeetingService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<MeetingEntity> meetingPage = meetingRepository.searchMeetings(
                 title, result.minParticipants(), result.maxParticipants(),
-                result.techStacks(), result.location(), result.duration(),
+                result.techStackIds(), result.location(), result.duration(),
                 result.minLatitude(), result.maxLatitude(), result.minLongitude(), result.maxLongitude(), pageable);
 
         return meetingPage.map(meeting -> {
@@ -271,9 +268,9 @@ public class MeetingService {
     }
 
     private FilterData getFilterData(SearchFilterDto searchFilterDto) {
-        int minParticipants = searchFilterDto.getMinParticipants();
-        int maxParticipants = searchFilterDto.getMaxParticipants();
-        List<String> techStacks = searchFilterDto.getTechStacks();
+        Integer minParticipants = searchFilterDto.getMinParticipants() != null ? searchFilterDto.getMinParticipants() : 0;
+        Integer maxParticipants = searchFilterDto.getMaxParticipants() != null ? searchFilterDto.getMaxParticipants() : Integer.MAX_VALUE;
+        List<Long> techStackIds = searchFilterDto.getTechStackIds() != null ? searchFilterDto.getTechStackIds() : Collections.emptyList();
         String location = searchFilterDto.getLocation();
         Duration duration = searchFilterDto.getDuration();
         Double minLatitude = searchFilterDto.getMinLatitude();
@@ -281,12 +278,11 @@ public class MeetingService {
         Double minLongitude = searchFilterDto.getMinLongitude();
         Double maxLongitude = searchFilterDto.getMaxLongitude();
 
-        FilterData result = new FilterData(minParticipants, maxParticipants, techStacks, location, duration,
+        return new FilterData(minParticipants, maxParticipants, techStackIds, location, duration,
                 minLatitude, maxLatitude, minLongitude, maxLongitude);
-        return result;
     }
 
-    private record FilterData(int minParticipants, int maxParticipants, List<String> techStacks, String location, Duration duration,
+    private record FilterData(int minParticipants, int maxParticipants, List<Long> techStackIds, String location, Duration duration,
                               Double minLatitude, Double maxLatitude, Double minLongitude, Double maxLongitude) {
     }
 

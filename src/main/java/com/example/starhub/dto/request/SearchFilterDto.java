@@ -12,7 +12,7 @@ public class SearchFilterDto {
 
     private Integer minParticipants;
     private Integer maxParticipants;
-    private List<String> techStacks;
+    private List<Long> techStackIds;
     private String location;
     private Duration duration;
 
