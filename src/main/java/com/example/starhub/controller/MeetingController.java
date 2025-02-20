@@ -54,18 +54,16 @@ public class MeetingController implements MeetingControllerDocs {
     public ResponseEntity<ResponseDto<Page<MeetingSummaryResponseDto>>> searchMeetings(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestParam(required = false) String title,
-            @RequestParam(required = true) Double minLatitude,
-            @RequestParam(required = true) Double maxLatitude,
-            @RequestParam(required = true) Double minLongitude,
-            @RequestParam(required = true) Double maxLongitude,
+            @RequestParam String c, // 지도의 좌표 대한 값
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size,
             @RequestBody SearchFilterDto searchFilterDto) {
 
+        parseCoordinates(c, searchFilterDto);
+
         String username = customUserDetails != null ? customUserDetails.getUsername() : null;
-        Page<MeetingSummaryResponseDto> res = meetingService.searchMeetings(username, title,
-                searchFilterDto,
-                minLatitude, maxLatitude, minLongitude, maxLongitude, page, size);
+        Page<MeetingSummaryResponseDto> res = meetingService.searchMeetings(username, title, searchFilterDto, page, size);
+
         return ResponseEntity
                 .status(ResponseCode.SUCCESS_GET_MEETING_LIST.getStatus().value())
                 .body(new ResponseDto<>(ResponseCode.SUCCESS_GET_MEETING_LIST, res));
@@ -143,5 +141,14 @@ public class MeetingController implements MeetingControllerDocs {
                 .status(ResponseCode.SUCCESS_GET_CONFIRMED_MEMBERS.getStatus().value())
                 .body(new ResponseDto<>(ResponseCode.SUCCESS_GET_CONFIRMED_MEMBERS, res));
     }
+
+    private void parseCoordinates(String c, SearchFilterDto searchFilterDto) {
+        String[] coordinates = c.split(",");
+        searchFilterDto.setMinLatitude(Double.parseDouble(coordinates[0]));
+        searchFilterDto.setMaxLatitude(Double.parseDouble(coordinates[1]));
+        searchFilterDto.setMinLongitude(Double.parseDouble(coordinates[2]));
+        searchFilterDto.setMaxLongitude(Double.parseDouble(coordinates[3]));
+    }
+
 
 }
