@@ -3,6 +3,7 @@ package com.example.starhub.controller;
 import com.example.starhub.controller.docs.MeetingControllerDocs;
 import com.example.starhub.dto.request.ConfirmMeetingRequestDto;
 import com.example.starhub.dto.request.CreateMeetingRequestDto;
+import com.example.starhub.dto.request.SearchFilterDto;
 import com.example.starhub.dto.request.UpdateMeetingRequestDto;
 import com.example.starhub.dto.response.ConfirmMeetingResponseDto;
 import com.example.starhub.dto.response.MeetingDetailResponseDto;
@@ -22,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -48,24 +50,21 @@ public class MeetingController implements MeetingControllerDocs {
     /**
      * 모임 목록 불러오기 (메인 화면에 쓰일 API)
      */
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<ResponseDto<Page<MeetingSummaryResponseDto>>> searchMeetings(
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) Integer minParticipants,
-            @RequestParam(required = false) Integer maxParticipants,
-            @RequestParam(required = false) List<String> techStacks,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) Duration duration,
             @RequestParam(required = true) Double minLatitude,
             @RequestParam(required = true) Double maxLatitude,
             @RequestParam(required = true) Double minLongitude,
             @RequestParam(required = true) Double maxLongitude,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "4") int size) {
+            @RequestParam(defaultValue = "4") int size,
+            @RequestBody SearchFilterDto searchFilterDto) {
 
         String username = customUserDetails != null ? customUserDetails.getUsername() : null;
-        Page<MeetingSummaryResponseDto> res = meetingService.searchMeetings(username, title, minParticipants, maxParticipants, techStacks, location, duration,
+        Page<MeetingSummaryResponseDto> res = meetingService.searchMeetings(username, title,
+                searchFilterDto,
                 minLatitude, maxLatitude, minLongitude, maxLongitude, page, size);
         return ResponseEntity
                 .status(ResponseCode.SUCCESS_GET_MEETING_LIST.getStatus().value())
@@ -144,4 +143,5 @@ public class MeetingController implements MeetingControllerDocs {
                 .status(ResponseCode.SUCCESS_GET_CONFIRMED_MEMBERS.getStatus().value())
                 .body(new ResponseDto<>(ResponseCode.SUCCESS_GET_CONFIRMED_MEMBERS, res));
     }
+
 }

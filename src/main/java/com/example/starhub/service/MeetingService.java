@@ -2,6 +2,7 @@ package com.example.starhub.service;
 
 import com.example.starhub.dto.request.ConfirmMeetingRequestDto;
 import com.example.starhub.dto.request.CreateMeetingRequestDto;
+import com.example.starhub.dto.request.SearchFilterDto;
 import com.example.starhub.dto.request.UpdateMeetingRequestDto;
 import com.example.starhub.dto.response.*;
 import com.example.starhub.entity.*;
@@ -105,15 +106,18 @@ public class MeetingService {
      *
      * @return 모임 목록 응답 DTO
      */
-    public Page<MeetingSummaryResponseDto> searchMeetings(String username, String title, Integer minParticipants, Integer maxParticipants,
-                                              List<String> techStacks, String location, Duration duration,
-                                              Double minLatitude, Double maxLatitude, Double minLongitude, Double maxLongitude,
-                                              int page, int size) {
+    public Page<MeetingSummaryResponseDto> searchMeetings(String username, String title,
+                                                          SearchFilterDto searchFilterDto,
+                                                          Double minLatitude, Double maxLatitude, Double minLongitude, Double maxLongitude,
+                                                          int page, int size) {
+
+        // 필터링 정보 가져오기
+        FilterData result = getFilterData(searchFilterDto);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<MeetingEntity> meetingPage = meetingRepository.searchMeetings(
-                title, minParticipants, maxParticipants,
-                techStacks, location, duration, minLatitude, maxLatitude, minLongitude, maxLongitude, pageable);
+                title, result.minParticipants(), result.maxParticipants(),
+                result.techStacks(), result.location(), result.duration(), minLatitude, maxLatitude, minLongitude, maxLongitude, pageable);
 
         return meetingPage.map(meeting -> {
             List<String> techStackNames = getTechStacksForMeeting(meeting);
@@ -265,6 +269,19 @@ public class MeetingService {
 
         // 승인된 지원서들 반환
         return getConfirmedMembersForCreator(meetingEntity, creatorInfo);
+    }
+
+    private FilterData getFilterData(SearchFilterDto searchFilterDto) {
+        int minParticipants = searchFilterDto.getMinParticipants();
+        int maxParticipants = searchFilterDto.getMaxParticipants();
+        List<String> techStacks = searchFilterDto.getTechStacks();
+        String location = searchFilterDto.getLocation();
+        Duration duration = searchFilterDto.getDuration();
+        FilterData result = new FilterData(minParticipants, maxParticipants, techStacks, location, duration);
+        return result;
+    }
+
+    private record FilterData(int minParticipants, int maxParticipants, List<String> techStacks, String location, Duration duration) {
     }
 
     /**
