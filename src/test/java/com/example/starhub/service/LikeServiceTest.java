@@ -96,10 +96,10 @@ class LikeServiceTest {
     void deleteLike_Success() {
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
         when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
-        when(likeRepository.findByUserAndMeeting(user, meeting)).thenReturn(Optional.of(likeEntity));
+        when(likeRepository.deleteByUserAndMeeting(user, meeting)).thenReturn(1);
 
         assertDoesNotThrow(() -> likeService.deleteLike("testUser", 1L));
-        verify(likeRepository, times(1)).delete(likeEntity);
+        verify(likeRepository, times(1)).deleteByUserAndMeeting(user, meeting);
     }
 
     @Test
@@ -123,7 +123,7 @@ class LikeServiceTest {
     void deleteLike_NotFound() {
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
         when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
-        when(likeRepository.findByUserAndMeeting(user, meeting)).thenReturn(Optional.empty());
+        when(likeRepository.deleteByUserAndMeeting(user, meeting)).thenReturn(0);
 
         LikeNotFoundException exception = assertThrows(LikeNotFoundException.class, () -> likeService.deleteLike("testUser", 1L));
         assertEquals(ErrorCode.LIKE_NOT_FOUND, exception.getErrorCode());
