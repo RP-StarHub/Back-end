@@ -72,9 +72,9 @@ public class LikeService {
         UserEntity userEntity = validateAndGetUser(username);
         MeetingEntity meetingEntity = validateAndGetMeeting(meetingId);
 
-        LikeEntity likeEntity = likeRepository.findByUserAndMeeting(userEntity, meetingEntity)
-                .orElseThrow(() -> new LikeNotFoundException(ErrorCode.LIKE_NOT_FOUND));
-
-        likeRepository.delete(likeEntity);
+        int deletedCount = likeRepository.deleteByUserAndMeeting(userEntity, meetingEntity);
+        if (deletedCount == 0) {
+            throw new LikeNotFoundException(ErrorCode.LIKE_NOT_FOUND);
+        }
     }
 }

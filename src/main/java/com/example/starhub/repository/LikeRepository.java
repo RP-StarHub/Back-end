@@ -19,4 +19,5 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
     Optional<LikeEntity> findByUserAndMeeting(UserEntity user, MeetingEntity meeting);
     List<LikeEntity> findTop3ByUserOrderByCreatedAtDesc(UserEntity user);
     Page<LikeEntity> findByUser(UserEntity user, Pageable pageable);
+    int deleteByUserAndMeeting(UserEntity user, MeetingEntity meeting);
 }
