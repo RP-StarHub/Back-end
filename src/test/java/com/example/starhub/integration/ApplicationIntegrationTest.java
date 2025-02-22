@@ -1,4 +1,4 @@
-package com.example.starhub.service;
+package com.example.starhub.integration;
 
 import com.example.starhub.dto.request.ApplicationRequestDto;
 import com.example.starhub.dto.response.ApplicationResponseDto;
@@ -10,6 +10,7 @@ import com.example.starhub.repository.ApplicationRepository;
 import com.example.starhub.repository.MeetingRepository;
 import com.example.starhub.repository.UserRepository;
 import com.example.starhub.response.code.ErrorCode;
+import com.example.starhub.service.ApplicationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class ApplicationServiceTest {
+class ApplicationIntegrationTest {
 
     @Autowired
     private ApplicationService applicationService;

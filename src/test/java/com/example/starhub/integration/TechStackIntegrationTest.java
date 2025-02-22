@@ -1,10 +1,11 @@
-package com.example.starhub.service;
+package com.example.starhub.integration;
 
 import com.example.starhub.dto.request.TechStackDto;
 import com.example.starhub.dto.response.TechStackResponseDto;
 import com.example.starhub.entity.TechStackEntity;
 import com.example.starhub.entity.enums.TechCategory;
 import com.example.starhub.repository.TechStackRepository;
+import com.example.starhub.service.TechStackService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional
-class TechStackServiceTest {
+class TechStackIntegrationTest {
 
     @Autowired
     private TechStackService techStackService;

@@ -1,4 +1,4 @@
-package com.example.starhub.service;
+package com.example.starhub.integration;
 
 import com.example.starhub.dto.request.*;
 import com.example.starhub.dto.response.ApplicationResponseDto;
@@ -13,6 +13,9 @@ import com.example.starhub.entity.enums.RecruitmentType;
 import com.example.starhub.entity.enums.TechCategory;
 import com.example.starhub.exception.*;
 import com.example.starhub.repository.*;
+import com.example.starhub.service.ApplicationService;
+import com.example.starhub.service.LikeService;
+import com.example.starhub.service.MeetingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MeetingServiceTest {
+class MeetingIntegrationTest {
 
     @Autowired
     private MeetingService meetingService;

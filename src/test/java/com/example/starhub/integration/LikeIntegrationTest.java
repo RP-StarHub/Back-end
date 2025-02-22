@@ -1,4 +1,4 @@
-package com.example.starhub.service;
+package com.example.starhub.integration;
 
 import com.example.starhub.entity.MeetingEntity;
 import com.example.starhub.entity.UserEntity;
@@ -8,6 +8,7 @@ import com.example.starhub.repository.LikeRepository;
 import com.example.starhub.repository.MeetingRepository;
 import com.example.starhub.repository.UserRepository;
 import com.example.starhub.response.code.ErrorCode;
+import com.example.starhub.service.LikeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class LikeServiceTest {
+class LikeIntegrationTest {
 
     @Autowired
     private LikeService likeService;
