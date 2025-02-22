@@ -12,6 +12,7 @@ import com.example.starhub.repository.MeetingRepository;
 import com.example.starhub.repository.UserRepository;
 import com.example.starhub.response.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +29,8 @@ public class LikeService {
      * 공통 검증 로직: 모임 가져오기
      */
     private MeetingEntity validateAndGetMeeting(Long meetingId) {
-        MeetingEntity meetingEntity = meetingRepository.findById(meetingId)
+        return meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new MeetingNotFoundException(ErrorCode.MEETING_NOT_FOUND));
-
-        return meetingEntity;
     }
 
     /**
@@ -53,13 +52,13 @@ public class LikeService {
         UserEntity userEntity = validateAndGetUser(username);
         MeetingEntity meetingEntity = validateAndGetMeeting(meetingId);
 
-        if (likeRepository.existsByUserAndMeeting(userEntity, meetingEntity)) {
-            throw new LikeAlreadyExistsException(ErrorCode.LIKE_ALREADY_EXISTS);
-        }
-
         LikeEntity likeEntity = LikeEntity.createLike(userEntity, meetingEntity);
 
-        likeRepository.save(likeEntity);
+        try {
+            likeRepository.save(likeEntity);
+        } catch (DataIntegrityViolationException e) {
+            throw new LikeAlreadyExistsException(ErrorCode.LIKE_ALREADY_EXISTS);
+        }
     }
 
     /**
