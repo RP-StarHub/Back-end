@@ -1,86 +1,132 @@
 package com.example.starhub.service;
 
+import com.example.starhub.entity.LikeEntity;
 import com.example.starhub.entity.MeetingEntity;
 import com.example.starhub.entity.UserEntity;
 import com.example.starhub.exception.LikeAlreadyExistsException;
 import com.example.starhub.exception.LikeNotFoundException;
+import com.example.starhub.exception.MeetingNotFoundException;
+import com.example.starhub.exception.UserNotFoundException;
 import com.example.starhub.repository.LikeRepository;
 import com.example.starhub.repository.MeetingRepository;
 import com.example.starhub.repository.UserRepository;
 import com.example.starhub.response.code.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class LikeServiceTest {
 
-    @Autowired
-    private LikeService likeService;
-
-    @Autowired
+    @Mock
     private LikeRepository likeRepository;
 
-    @Autowired
+    @Mock
+    private MeetingRepository meetingRepository;
+
+    @Mock
     private UserRepository userRepository;
 
-    @Autowired
-    private MeetingRepository meetingRepository;
+    @InjectMocks
+    private LikeService likeService;
 
     private UserEntity user;
     private MeetingEntity meeting;
+    private LikeEntity likeEntity;
 
     @BeforeEach
     void setUp() {
-        // 테스트용 사용자와 모임 생성
-        user = userRepository.save(UserEntity.createUser("testUser", "password"));
-        meeting = meetingRepository.save(MeetingEntity.builder()
+        user = UserEntity.createUser("testUser", "testPassword");
+        meeting = MeetingEntity.builder()
                 .title("Test Meeting")
                 .creator(user)
                 .isConfirmed(false)
-                .build());
+                .build();
+
+        likeEntity = LikeEntity.createLike(user, meeting);
     }
 
     @Test
-    void createLike_shouldCreateLikeSuccessfully_whenLikeDoesNotExist() {
-        likeService.createLike(user.getUsername(), meeting.getId());
+    void createLike_Success() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+        when(likeRepository.save(any(LikeEntity.class))).thenReturn(likeEntity);
 
-        assertTrue(likeRepository.existsByUserAndMeeting(user, meeting));
+        assertDoesNotThrow(() -> likeService.createLike("testUser", 1L));
+        verify(likeRepository, times(1)).save(any(LikeEntity.class));
     }
 
     @Test
-    void createLike_shouldThrowException_whenLikeAlreadyExists() {
+    void createLike_UserNotFound() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.empty());
 
-        likeService.createLike(user.getUsername(), meeting.getId());
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> likeService.createLike("testUser", 1L));
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+    }
 
-        LikeAlreadyExistsException exception = assertThrows(LikeAlreadyExistsException.class, () -> {
-            likeService.createLike(user.getUsername(), meeting.getId());
-        });
+    @Test
+    void createLike_MeetingNotFound() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(meetingRepository.findById(1L)).thenReturn(Optional.empty());
 
+        MeetingNotFoundException exception = assertThrows(MeetingNotFoundException.class, () -> likeService.createLike("testUser", 1L));
+        assertEquals(ErrorCode.MEETING_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    void createLike_AlreadyExists() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+        when(likeRepository.save(any(LikeEntity.class))).thenThrow(DataIntegrityViolationException.class);
+
+        LikeAlreadyExistsException exception = assertThrows(LikeAlreadyExistsException.class, () -> likeService.createLike("testUser", 1L));
         assertEquals(ErrorCode.LIKE_ALREADY_EXISTS, exception.getErrorCode());
     }
 
     @Test
-    void deleteLike_shouldDeleteLikeSuccessfully_whenLikeExists() {
-        likeService.createLike(user.getUsername(), meeting.getId()); // 먼저 좋아요 추가
+    void deleteLike_Success() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+        when(likeRepository.deleteByUserAndMeeting(user, meeting)).thenReturn(1);
 
-        likeService.deleteLike(user.getUsername(), meeting.getId());
-
-        assertFalse(likeRepository.existsByUserAndMeeting(user, meeting));
+        assertDoesNotThrow(() -> likeService.deleteLike("testUser", 1L));
+        verify(likeRepository, times(1)).deleteByUserAndMeeting(user, meeting);
     }
 
     @Test
-    void deleteLike_shouldThrowException_whenLikeNotFound() {
-        // When & Then
-        LikeNotFoundException exception = assertThrows(LikeNotFoundException.class, () -> {
-            likeService.deleteLike(user.getUsername(), meeting.getId());
-        });
+    void deleteLike_UserNotFound() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.empty());
 
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> likeService.deleteLike("testUser", 1L));
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    void deleteLike_MeetingNotFound() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(meetingRepository.findById(1L)).thenReturn(Optional.empty());
+
+        MeetingNotFoundException exception = assertThrows(MeetingNotFoundException.class, () -> likeService.deleteLike("testUser", 1L));
+        assertEquals(ErrorCode.MEETING_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    void deleteLike_NotFound() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+        when(likeRepository.deleteByUserAndMeeting(user, meeting)).thenReturn(0);
+
+        LikeNotFoundException exception = assertThrows(LikeNotFoundException.class, () -> likeService.deleteLike("testUser", 1L));
         assertEquals(ErrorCode.LIKE_NOT_FOUND, exception.getErrorCode());
     }
+
 }

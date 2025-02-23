@@ -1,4 +1,4 @@
-package com.example.starhub.service;
+package com.example.starhub.integration;
 
 import com.example.starhub.dto.request.ApplicationRequestDto;
 import com.example.starhub.dto.request.CreateProfileRequestDto;
@@ -10,6 +10,10 @@ import com.example.starhub.entity.UserEntity;
 import com.example.starhub.exception.UserNotFoundException;
 import com.example.starhub.repository.MeetingRepository;
 import com.example.starhub.repository.UserRepository;
+import com.example.starhub.service.ApplicationService;
+import com.example.starhub.service.LikeService;
+import com.example.starhub.service.MyPageService;
+import com.example.starhub.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MyPageServiceTest {
+class MyPageIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
