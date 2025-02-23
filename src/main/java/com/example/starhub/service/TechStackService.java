@@ -28,9 +28,9 @@ public class TechStackService {
     public List<TechStackResponseDto> getTechStack() {
         List<TechStackEntity> techStackEntities = techStackRepository.findByCategoryNot(TechCategory.OTHER);
 
-        return techStackEntities.stream()
-                .map(techStack -> TechStackResponseDto.fromEntity(techStack))
+        return techStackEntities
+                .stream()
+                .map(TechStackResponseDto::fromEntity)
                 .collect(Collectors.toList());
-
     }
 }
