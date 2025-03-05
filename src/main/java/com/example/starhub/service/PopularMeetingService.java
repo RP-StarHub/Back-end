@@ -56,10 +56,7 @@ public class PopularMeetingService {
      */
     private List<MeetingSummaryResponseDto> getPopularMeetings(RecruitmentType recruitmentType, String username, boolean isExpiring) {
         List<Long> meetingIds = getMeetingIds(recruitmentType, isExpiring);
-
-        if (meetingIds.isEmpty()) {
-            return Collections.emptyList();
-        }
+        if (meetingIds.isEmpty()) return Collections.emptyList();
 
         Map<Long, Set<String>> meetingTechStacksMap = getTechStacksMap(meetingIds);
 
