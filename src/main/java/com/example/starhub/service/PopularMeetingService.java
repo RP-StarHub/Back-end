@@ -25,6 +25,9 @@ public class PopularMeetingService {
     private final MeetingTechStackRepository meetingTechStackRepository;
     private final LikeRepository likeRepository;
 
+    public static final int FIRST_PAGE = 0;
+    private static final int TOP_N_POPULAR_MEETINGS = 3;
+
     /**
      * 인기글 페이지 - 프로젝트 인기글 3개를 반환합니다.
      */
@@ -70,9 +73,9 @@ public class PopularMeetingService {
      */
     private List<Long> getMeetingIds(RecruitmentType recruitmentType, boolean isExpiring) {
         if (isExpiring) {
-            return meetingRepository.findTop3ExpiringPopularMeetingsIds(PageRequest.of(0, 3));
+            return meetingRepository.findTop3ExpiringPopularMeetingsIds(PageRequest.of(FIRST_PAGE, TOP_N_POPULAR_MEETINGS));
         } else {
-            return meetingRepository.findTop3PopularMeetingIds(recruitmentType, PageRequest.of(0, 3));
+            return meetingRepository.findTop3PopularMeetingIds(recruitmentType, PageRequest.of(FIRST_PAGE, TOP_N_POPULAR_MEETINGS));
         }
     }
 
