@@ -5,9 +5,9 @@ import com.example.starhub.dto.response.MeetingSummaryResponseDto;
 import com.example.starhub.entity.MeetingEntity;
 import com.example.starhub.entity.MeetingTechStackEntity;
 import com.example.starhub.entity.enums.RecruitmentType;
-import com.example.starhub.exception.MeetingNotFoundException;
-import com.example.starhub.repository.*;
-import com.example.starhub.response.code.ErrorCode;
+import com.example.starhub.repository.LikeRepository;
+import com.example.starhub.repository.MeetingRepository;
+import com.example.starhub.repository.MeetingTechStackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,9 @@ public class PopularMeetingService {
     private final MeetingRepository meetingRepository;
     private final MeetingTechStackRepository meetingTechStackRepository;
     private final LikeRepository likeRepository;
+
+    public static final int FIRST_PAGE = 0;
+    private static final int TOP_N_POPULAR_MEETINGS = 3;
 
     /**
      * 인기글 페이지 - 프로젝트 인기글 3개를 반환합니다.
@@ -56,15 +59,13 @@ public class PopularMeetingService {
      */
     private List<MeetingSummaryResponseDto> getPopularMeetings(RecruitmentType recruitmentType, String username, boolean isExpiring) {
         List<Long> meetingIds = getMeetingIds(recruitmentType, isExpiring);
+        if (meetingIds.isEmpty()) return Collections.emptyList();
 
-        if (meetingIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
+        List<MeetingEntity> meetings = meetingRepository.findAllById(meetingIds);
         Map<Long, Set<String>> meetingTechStacksMap = getTechStacksMap(meetingIds);
 
-        return meetingIds.stream()
-                .map(meetingId -> createMeetingSummaryResponseDto(meetingId, username, meetingTechStacksMap))
+        return meetings.stream()
+                .map(meeting -> createMeetingSummaryResponseDto(meeting, username, meetingTechStacksMap))
                 .collect(Collectors.toList());
     }
 
@@ -73,9 +74,9 @@ public class PopularMeetingService {
      */
     private List<Long> getMeetingIds(RecruitmentType recruitmentType, boolean isExpiring) {
         if (isExpiring) {
-            return meetingRepository.findTop3ExpiringPopularMeetingsIds(PageRequest.of(0, 3));
+            return meetingRepository.findTop3ExpiringPopularMeetingsIds(PageRequest.of(FIRST_PAGE, TOP_N_POPULAR_MEETINGS));
         } else {
-            return meetingRepository.findTop3PopularMeetingIds(recruitmentType, PageRequest.of(0, 3));
+            return meetingRepository.findTop3PopularMeetingIds(recruitmentType, PageRequest.of(FIRST_PAGE, TOP_N_POPULAR_MEETINGS));
         }
     }
 
@@ -94,13 +95,9 @@ public class PopularMeetingService {
     /**
      * 해당 모임 ID에 대해 DTO를 생성합니다.
      */
-    private MeetingSummaryResponseDto createMeetingSummaryResponseDto(Long meetingId, String username, Map<Long, Set<String>> meetingTechStacksMap) {
-        Set<String> techStacksSet = meetingTechStacksMap.getOrDefault(meetingId, Collections.emptySet());
+    private MeetingSummaryResponseDto createMeetingSummaryResponseDto(MeetingEntity meeting, String username, Map<Long, Set<String>> meetingTechStacksMap) {
+        Set<String> techStacksSet = meetingTechStacksMap.getOrDefault(meeting.getId(), Collections.emptySet());
         List<String> techStacks = new ArrayList<>(techStacksSet);
-
-        // 해당 meetingId에 대한 MeetingEntity를 가져오기
-        MeetingEntity meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new MeetingNotFoundException(ErrorCode.MEETING_NOT_FOUND));
 
         // 좋아요 관련 정보를 가져오기
         LikeDto likeDto = getLikeDtoForMeeting(meeting, username);
