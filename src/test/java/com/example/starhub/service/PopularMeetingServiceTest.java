@@ -139,8 +139,99 @@ class PopularMeetingServiceTest {
         List<MeetingSummaryResponseDto> result = popularMeetingService.getPopularProjects("testUser");
 
         assertNotNull(result);
-        assertTrue(result.stream().allMatch(dto -> dto.getTitle().equals(meeting.getTitle())));  // DTO가 올바르게 변환되었는지 확인
+        assertTrue(result.stream().allMatch(dto -> dto.getTitle().equals(meeting.getTitle()))); 
     }
 
+    @Test
+    void testGetPopularStudies_success() {
+        List<Long> meetingIds = Arrays.asList(1L, 2L, 3L);
+        List<MeetingEntity> meetings = Arrays.asList(meeting, meeting, meeting);
+
+        when(meetingRepository.findTop3PopularMeetingIds(RecruitmentType.STUDY, PageRequest.of(0, 3)))
+                .thenReturn(meetingIds);
+
+        when(meetingRepository.findAllById(meetingIds)).thenReturn(meetings);
+
+        List<MeetingSummaryResponseDto> result = popularMeetingService.getPopularStudies("testUser");
+
+        // then
+        assertNotNull(result);
+        assertEquals(3, result.size());
+    }
+
+    @Test
+    void testGetPopularStudies_noPopularMeetings() {
+        when(meetingRepository.findTop3PopularMeetingIds(RecruitmentType.STUDY, PageRequest.of(0, 3)))
+                .thenReturn(Collections.emptyList());
+
+        List<MeetingSummaryResponseDto> result = popularMeetingService.getPopularStudies("testUser");
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testGetPopularStudies_anonUser() {
+        List<Long> meetingIds = Arrays.asList(1L, 2L, 3L);
+        List<MeetingEntity> meetings = Arrays.asList(meeting, meeting, meeting);
+
+        when(meetingRepository.findTop3PopularMeetingIds(RecruitmentType.STUDY, PageRequest.of(0, 3)))
+                .thenReturn(meetingIds);
+        when(meetingRepository.findAllById(meetingIds)).thenReturn(meetings);
+
+        List<MeetingSummaryResponseDto> result = popularMeetingService.getPopularStudies(null);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertNull(result.get(0).getLikeDto().getIsLiked());
+    }
+
+    @Test
+    void testGetPopularStudies_lessThanThreeMeetings() {
+        List<Long> meetingIds = Arrays.asList(1L, 2L);
+        List<MeetingEntity> meetings = Arrays.asList(meeting, meeting);
+
+        when(meetingRepository.findTop3PopularMeetingIds(RecruitmentType.STUDY, PageRequest.of(0, 3)))
+                .thenReturn(meetingIds);
+        when(meetingRepository.findAllById(meetingIds)).thenReturn(meetings);
+
+        List<MeetingSummaryResponseDto> result = popularMeetingService.getPopularStudies("testUser");
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetPopularStudies_dbError() {
+        when(meetingRepository.findTop3PopularMeetingIds(RecruitmentType.STUDY, PageRequest.of(0, 3)))
+                .thenThrow(new RuntimeException("DB Error"));
+
+        assertThrows(RuntimeException.class, () -> popularMeetingService.getPopularStudies("testUser"));
+    }
+
+    @Test
+    void testGetPopularStudies_findAllByIdError() {
+        List<Long> meetingIds = Arrays.asList(1L, 2L, 3L);
+        when(meetingRepository.findTop3PopularMeetingIds(RecruitmentType.STUDY, PageRequest.of(0, 3)))
+                .thenReturn(meetingIds);
+        when(meetingRepository.findAllById(meetingIds))
+                .thenThrow(new RuntimeException("DB Error during findAllById"));
+
+        assertThrows(RuntimeException.class, () -> popularMeetingService.getPopularStudies("testUser"));
+    }
+
+    @Test
+    void testGetPopularStudies_dtoMapping() {
+        List<Long> meetingIds = Arrays.asList(1L, 2L, 3L);
+        List<MeetingEntity> meetings = Arrays.asList(meeting, meeting, meeting);
+
+        when(meetingRepository.findTop3PopularMeetingIds(RecruitmentType.STUDY, PageRequest.of(0, 3)))
+                .thenReturn(meetingIds);
+        when(meetingRepository.findAllById(meetingIds)).thenReturn(meetings);
+
+        List<MeetingSummaryResponseDto> result = popularMeetingService.getPopularStudies("testUser");
+
+        assertNotNull(result);
+        assertTrue(result.stream().allMatch(dto -> dto.getTitle().equals(meeting.getTitle())));
+    }
 
 }
