@@ -1,10 +1,12 @@
 package com.example.starhub.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+@AllArgsConstructor
 @Getter
 public class CreateUserRequestDto {
 
