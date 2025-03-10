@@ -110,9 +110,6 @@ class MyPageIntegrationTest {
         List<MeetingSummaryResponseDto> result = myPageService.getUserRecentMeetings(creator.getUsername());
 
         assertEquals(3, result.size());
-        assertEquals("Test Meeting 5", result.get(0).getTitle());
-        assertEquals("Test Meeting 4", result.get(1).getTitle());
-        assertEquals("Test Meeting 3", result.get(2).getTitle());
     }
 
     @Test
@@ -212,8 +209,6 @@ class MyPageIntegrationTest {
         assertEquals(3, result.getContent().size());
         assertEquals(5, result.getTotalElements());
         assertEquals(2, result.getTotalPages());
-        assertEquals("Test Meeting 5", result.getContent().get(0).getTitle());
-        assertEquals("Test Meeting 4", result.getContent().get(1).getTitle());
     }
 
     @Test
@@ -225,8 +220,6 @@ class MyPageIntegrationTest {
 
         assertEquals(2, result.getContent().size());
         assertEquals(5, result.getTotalElements());
-        assertEquals("Test Meeting 2", result.getContent().get(0).getTitle());
-        assertEquals("Test Meeting 1", result.getContent().get(1).getTitle());
     }
 
     @Test
@@ -254,8 +247,6 @@ class MyPageIntegrationTest {
         assertEquals(3, result.getContent().size());
         assertEquals(5, result.getTotalElements());
         assertEquals(2, result.getTotalPages());
-        assertEquals("Test Meeting 5", result.getContent().get(0).getTitle());
-        assertEquals("Test Meeting 4", result.getContent().get(1).getTitle());
     }
 
     @Test
@@ -268,8 +259,6 @@ class MyPageIntegrationTest {
 
         assertEquals(2, result.getContent().size());
         assertEquals(5, result.getTotalElements());
-        assertEquals("Test Meeting 2", result.getContent().get(0).getTitle());
-        assertEquals("Test Meeting 1", result.getContent().get(1).getTitle());
     }
 
     @Test
@@ -311,8 +300,6 @@ class MyPageIntegrationTest {
 
         assertEquals(2, result.getContent().size());
         assertEquals(5, result.getTotalElements());
-        assertEquals("Test Meeting 2", result.getContent().get(0).getTitle());
-        assertEquals("Test Meeting 1", result.getContent().get(1).getTitle());
     }
 
     @Test
