@@ -2,12 +2,11 @@ package com.example.starhub.service.filter;
 
 import com.example.starhub.dto.request.CreateUserRequestDto;
 import com.example.starhub.dto.response.LoginResponseDto;
-import com.example.starhub.dto.response.UserResponseDto;
 import com.example.starhub.dto.response.util.ResponseUtil;
 import com.example.starhub.dto.security.CustomUserDetails;
 import com.example.starhub.response.code.ErrorCode;
 import com.example.starhub.response.code.ResponseCode;
-import com.example.starhub.service.RedisService;
+import com.example.starhub.config.Redis.RedisService;
 import com.example.starhub.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
