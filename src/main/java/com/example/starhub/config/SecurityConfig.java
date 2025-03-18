@@ -1,6 +1,6 @@
 package com.example.starhub.config;
 
-import com.example.starhub.service.RedisService;
+import com.example.starhub.config.Redis.RedisService;
 import com.example.starhub.service.filter.JWTFilter;
 import com.example.starhub.service.filter.LoginFilter;
 import com.example.starhub.service.filter.LogoutFilter;
