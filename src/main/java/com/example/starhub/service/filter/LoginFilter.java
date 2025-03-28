@@ -6,7 +6,7 @@ import com.example.starhub.dto.response.util.ResponseUtil;
 import com.example.starhub.dto.security.CustomUserDetails;
 import com.example.starhub.response.code.ErrorCode;
 import com.example.starhub.response.code.ResponseCode;
-import com.example.starhub.config.Redis.RedisService;
+import com.example.starhub.config.redis.RedisService;
 import com.example.starhub.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;

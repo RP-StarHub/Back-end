@@ -59,6 +59,9 @@ dependencies {
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
+	//actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'org.hibernate:hibernate-search:5.11.1.Final'
 }

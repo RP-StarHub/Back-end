@@ -1,6 +1,6 @@
 package com.example.starhub.service;
 
-import com.example.starhub.config.Redis.RedisService;
+import com.example.starhub.config.redis.RedisService;
 import com.example.starhub.service.filter.LogoutFilter;
 import com.example.starhub.util.JWTUtil;
 import org.junit.jupiter.api.BeforeEach;

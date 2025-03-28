@@ -1,6 +1,6 @@
 package com.example.starhub.config;
 
-import com.example.starhub.config.Redis.RedisService;
+import com.example.starhub.config.redis.RedisService;
 import com.example.starhub.service.filter.JWTFilter;
 import com.example.starhub.service.filter.LoginFilter;
 import com.example.starhub.service.filter.LogoutFilter;
@@ -90,6 +90,7 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.POST, "/api/v1/meetings/search").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/v1/techStacks").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/v1/meetings/popular/projects", "/api/v1/meetings/popular/studies", "/api/v1/meetings/popular/expiring").permitAll()
+                        .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
 
                         // 관리자만 접근 가능 경로
                         .antMatchers(HttpMethod.POST, "/api/v1/techStacks").hasRole("ADMIN")

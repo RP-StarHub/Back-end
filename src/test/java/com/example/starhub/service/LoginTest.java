@@ -1,8 +1,7 @@
 package com.example.starhub.service;
 
-import com.example.starhub.config.Redis.RedisService;
+import com.example.starhub.config.redis.RedisService;
 import com.example.starhub.dto.request.CreateUserRequestDto;
-import com.example.starhub.dto.security.CustomUserDetails;
 import com.example.starhub.service.filter.LoginFilter;
 import com.example.starhub.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,9 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

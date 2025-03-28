@@ -3,7 +3,7 @@ package com.example.starhub.service.filter;
 import com.example.starhub.dto.response.util.ResponseUtil;
 import com.example.starhub.response.code.ErrorCode;
 import com.example.starhub.response.code.ResponseCode;
-import com.example.starhub.config.Redis.RedisService;
+import com.example.starhub.config.redis.RedisService;
 import com.example.starhub.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

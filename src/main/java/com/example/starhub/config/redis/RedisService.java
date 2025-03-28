@@ -1,4 +1,4 @@
-package com.example.starhub.config.Redis;
+package com.example.starhub.config.redis;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
