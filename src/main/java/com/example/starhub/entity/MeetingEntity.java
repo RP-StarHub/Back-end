@@ -19,6 +19,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
+@Table(
+        name = "post",
+        indexes = {
+                @Index(name = "idx_post_recruit_confirm", columnList = "recruitmentType, isConfirmed"),
+                @Index(name = "idx_post_enddate_confirm", columnList = "endDate, isConfirmed")
+        }
+)
 public class MeetingEntity {
 
     @Id

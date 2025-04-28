@@ -11,6 +11,10 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(
+        name = "meeting_tech_stack",
+        indexes = @Index(name = "idx_meeting_tech_stack_meeting", columnList = "meeting_id")
+)
 public class MeetingTechStackEntity {
 
     @Id

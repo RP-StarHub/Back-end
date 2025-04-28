@@ -13,7 +13,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "meeting_id"}))
+@Table(
+        name = "like",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "meeting_id"}),
+        indexes = @Index(name = "idx_like_meeting_user", columnList = "meeting_id, user_id")
+)
 public class LikeEntity {
 
     @Id

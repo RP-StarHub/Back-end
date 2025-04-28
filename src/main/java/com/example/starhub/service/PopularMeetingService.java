@@ -1,5 +1,6 @@
 package com.example.starhub.service;
 
+import com.example.starhub.config.cache.CustomCacheable;
 import com.example.starhub.dto.response.LikeDto;
 import com.example.starhub.dto.response.MeetingSummaryResponseDto;
 import com.example.starhub.entity.MeetingEntity;
@@ -31,6 +32,7 @@ public class PopularMeetingService {
     /**
      * 인기글 페이지 - 프로젝트 인기글 3개를 반환합니다.
      */
+    @CustomCacheable(key = "'popular:project'", ttl = 300)
     public List<MeetingSummaryResponseDto> getPopularProjects(String username) {
         return getPopularMeetings(RecruitmentType.PROJECT, username, false);
     }
@@ -38,6 +40,7 @@ public class PopularMeetingService {
     /**
      * 인기글 페이지 - 스터디 인기글 3개를 반환합니다.
      */
+    @CustomCacheable(key = "'popular:study'", ttl = 300)
     public List<MeetingSummaryResponseDto> getPopularStudies(String username) {
         return getPopularMeetings(RecruitmentType.STUDY, username, false);
     }
@@ -45,6 +48,7 @@ public class PopularMeetingService {
     /**
      * 인기글 페이지 - 마감임박 인기글 3개를 반환합니다.
      */
+    @CustomCacheable(key = "'popular:deadline'", ttl = 300)
     public List<MeetingSummaryResponseDto> getExpiringPopularMeetings(String username) {
         return getPopularMeetings(null, username, true);
     }
